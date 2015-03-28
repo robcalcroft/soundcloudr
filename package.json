@@ -1,0 +1,23 @@
+{
+  "name": "soundcloudr",
+  "version": "1.0.0",
+  "description": "A node soundcloud downloader module",
+  "main": "soundcloudr.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robcalcroft/soundcloudr.git"
+  },
+  "keywords": [
+    "soundcloud",
+    "download"
+  ],
+  "author": "Rob Calcroft",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/robcalcroft/soundcloudr/issues"
+  },
+  "homepage": "https://github.com/robcalcroft/soundcloudr"
+}
