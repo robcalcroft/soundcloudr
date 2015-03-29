@@ -1,2 +1,2 @@
 # soundcloudr
-A node soundcloud downloader module
+An express soundcloud downloader module
