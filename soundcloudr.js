@@ -69,7 +69,7 @@ module.exports = {
 	*/
 	createStreamUrl: function(data) {
 		if(!this.getClientId()) {
-			throw new Error(this.errorStrings.clientid);
+			return false;
 		}
 
 		if(data.stream_url.indexOf('?') === -1) {
@@ -103,27 +103,39 @@ module.exports = {
 	*/
 	getStreamUrl: function(rawUrl, callback) {
 		
+		if(!callback || typeof callback !== 'function') {
+			throw new Error("Callback not given");
+		}
+
 		if (!rawUrl) {
-			throw new Error(this.errorStrings.rawurl);
+			return callback({
+				message: this.errorStrings.rawurl,
+				status: 400
+			}, false);
 		}
 
 		if(!this.getClientId()) {
-			throw new Error(this.errorStrings.clientid);
-		}
-
-		if(typeof callback !== 'function') {
-			throw new Error(this.errorStrings.notcallback);
+			return callback({
+				message: this.errorStrings.clientid,
+				status: 401
+			}, false);
 		}
 
 		var me = this;
 
 		request("http://api.soundcloud.com/resolve.json?url=" + rawUrl + "&client_id=" + this.getClientId(), function(error, response, data) {
 			if(error) {
-				throw new Error(error);
+				return callback({
+					message: error,
+					status: 500
+				}, false);
 			}
 
 			if(response.statusCode !== 200) {
-				throw new Error(me.errorStrings.not200 + response.statusCode);
+				return callback({
+					message: me.errorStrings.not200,
+					status: response.statusCode
+				}, false);
 			}
 
 			data = JSON.parse(data);
@@ -132,16 +144,22 @@ module.exports = {
 			// single song or user has provided
 			// link to e.g. artist account;
 			if(!me.isValidResponse(data)) {
-				throw new Error(me.errorStrings.notvalid);
+				return callback({
+					message: me.errorStrings.notvalid,
+					status: 400
+				}, false);
 			}
 
 
 			// Check if the song is streamable
 			if(!me.isStreamable(data)) {
-				throw new Error(me.errorStrings.notstreamable);
+				return callback({
+					message: me.errorStrings.notstreamable,
+					status: 405
+				}, false);
 			}
 
-			callback(me.createStreamUrl(data));
+			callback(false, me.createStreamUrl(data));
 		});
 	},
 
@@ -159,29 +177,55 @@ module.exports = {
 	* @param  {Object} response The users ExpressJS response object
 	* @return {Object}          The users ExpressJS response object
 	*/
-	download: function(rawUrl, response) {
+	download: function(rawUrl, e_response, callback) {
 		
-		if (!rawUrl) {
-			throw new Error(this.errorStrings.rawurl);
+		if(!callback || typeof callback !== 'function') {
+			if(e_response) {
+				return e_response.status(400).json({
+					message: "Callback not given",
+					status: 400
+				});
+			} else {
+				throw new Error("Callback not given");
+			}
 		}
 
-		if(!response) {
-			throw new Error(this.errorStrings.response);
+		if (!rawUrl) {
+			return callback({
+				message: this.errorStrings.rawurl,
+				status: 400
+			}, false);
+		}
+
+		if(!e_response) {
+			return callback({
+				message: this.errorStrings.response,
+				status: 400
+			}, false);
 		}
 
 		if(!this.getClientId()) {
-			throw new Error(this.errorStrings.clientid);
+			return callback({
+				message: this.errorStrings.clientid,
+				status: 401
+			}, false);
 		}
 
 		var me = this;
 
 		request("http://api.soundcloud.com/resolve.json?url=" + rawUrl + "&client_id=" + this.getClientId(), function(error, response, data) {
 			if(error) {
-				throw new Error(error);
+				return callback({
+					message: error,
+					status: 500
+				}, false);
 			}
 
 			if(response.statusCode !== 200) {
-				throw new Error(me.errorStrings.not200 + response.statusCode);
+				return callback({
+					message: me.errorStrings.not200,
+					status: response.statusCode
+				}, false);
 			}
 
 			data = JSON.parse(data);
@@ -190,26 +234,32 @@ module.exports = {
 			// single song or user has provided
 			// link to e.g. artist account;
 			if(!me.isValidResponse(data)) {
-				throw new Error(me.errorStrings.notvalid);
+				return callback({
+					message: me.errorStrings.notvalid,
+					status: 400
+				}, false);
 			}
 
 
 			// Check if the song is streamable
 			if(!me.isStreamable(data)) {
-				throw new Error(me.errorStrings.notstreamable);
+				return callback({
+					message: me.errorStrings.notstreamable,
+					status: 405
+				}, false);
 			}
 
 			var streamURL = me.createStreamUrl(data);
 
 			// Set headers to force download of file.
-			response.setHeader("Content-Type","application/octet-stream");
-			response.setHeader("Content-Transfer-Encoding", "Binary");
-			response.setHeader("Content-disposition", "attachment; filename=\"" + data.title + ".mp3\"");
+			e_response.setHeader("Content-Type","application/octet-stream");
+			e_response.setHeader("Content-Transfer-Encoding", "Binary");
+			e_response.setHeader("Content-disposition", "attachment; filename=\"" + data.title + ".mp3\"");
 
 
 			// Request the file and pipe it to
 			// the response.
-			request.get(streamURL).pipe(response);
+			request.get(streamURL).pipe(e_response);
 		});
 	}
 };

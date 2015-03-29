@@ -7,6 +7,10 @@ describe('Module Testing', function() {
 		assert.equal(typeof S.clientId, 'undefined')
 	})
 
+	it('should have an object of error strings', function() {
+		assert.equal(typeof S.errorStrings, 'object');
+	})
+
 	describe('getClientId()', function() {
 		it('should return the clientid if it is set', function() {
 			S.clientId = 12;
@@ -63,17 +67,48 @@ describe('Module Testing', function() {
 
 	describe('getStreamUrl()', function() {
 
-		it('should throw an error if there is no URL', function() {
-			assert.throws(S.getStreamUrl, Error)
+		it('should throw an error if there is no callback', function() {
+			assert.throws(S.getStreamUrl, Error);
+		})
+
+		it('should return a HTTP 400 Bad Request status error if there is no URL', function() {
+			assert.equal(S.getStreamUrl(undefined, function(err){return err}).status, 400);
+		})
+
+		it('should return a HTTP 401 Unaurthorized status error if there is no client id set', function() {
+			S.clientId = undefined;
+			assert.equal(S.getStreamUrl('test', function(err){return err}).status, 401);
 		})
 
 		it('should return a valid stream url when passed the Soundcloud track URL', function(done) {
 			S.setClientId(process.env.SCKEY)
-			S.getStreamUrl('https://soundcloud.com/gramatik/straight-off-the-block', function(string) {
+			S.getStreamUrl('https://soundcloud.com/gramatik/straight-off-the-block', function(err, string) {
 				// Could improve test
+				assert.equal(err, false)
 				assert.equal(/https:\/\/api.soundcloud.com\/tracks.+/.test(string), true);
 				done();
 			})
+		})
+	})
+
+	describe('download()', function() {
+
+		it('should throw an error if there is no callback', function() {
+			assert.throws(S.download, Error);
+		})
+
+		it('should return a HTTP 400 Bad Request status error if there is no URL', function() {
+			assert.equal(S.download(undefined, {}, function(err){return err}).status, 400);
+		})
+
+		it('should return a HTTP 401 Unaurthorized status error if there is no client id set', function() {
+			S.clientId = undefined;
+			assert.equal(S.download('test', {}, function(err){return err}).status, 401);
+		})
+
+		it('should return a HTTP 400 Bad Request status error if no Express response object is given', function() {
+			S.setClientId('123456');
+			assert.equal(S.download('test', undefined, function(err){return err}).status, 400);
 		})
 	})
 })
