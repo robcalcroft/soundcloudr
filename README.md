@@ -61,11 +61,11 @@ var fs = require('fs');
 soundcloudr.setClientId(fs.readFile('clientId.txt', 'UTF-8'));
 
 app.get('/download', function(request, response, next) {
-	var url = req.query.url;
+	var url = request.query.url;
 
 	soundcloudr.download(url, response, function(err) {
 		if(err) {
-			res.status(err.status).json({
+			response.status(err.status).json({
 				message: err.message
 			});
 		}
