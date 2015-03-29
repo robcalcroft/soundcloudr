@@ -60,7 +60,7 @@ var fs = require('fs');
 
 soundcloudr.setClientId(fs.readFile('clientId.txt', 'UTF-8'));
 
-app.get('/download', function(req, res, next) {
+app.get('/download', function(request, response, next) {
 	var url = req.query.url;
 
 	soundcloudr.download(url, response, function(err) {
