@@ -1,0 +1,12 @@
+language: node_js
+node_js:
+- '0.12'
+- '0.11'
+- '0.10'
+- '0.8'
+- '0.6'
+- iojs
+- iojs-v1.0.4
+env:
+  global:
+    secure: UALv0pE8Q3maSerYvOx4vTqO/QplzhgbcZV/jNCybkhND8xUG6m+LVCtPPTnoyHx381QqP46pYF4fkQcFOll3VS36dvHpu5fyTuRUq1eDXmHU0vB35Wk6MaOljoADjiNubrkVQqOX+6+9FsFBZ6bHSY02G2TjTl2Iigy2DZ9QS4=
