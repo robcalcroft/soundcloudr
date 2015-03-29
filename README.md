@@ -42,7 +42,7 @@ var fs = require('fs');
 
 soundcloudr.setClientId(fs.readFile('clientId.txt', 'UTF-8'));
 
-soundcloudr.getStreamUrl('https://soundcloud.com/madeon/pay-no-mind', function(err, url) {
+soundcloudr.getStreamUrl('https://soundcloud.com/annie-mac-presents/free-music-monday-jakwob-fade', function(err, url) {
 	if(err) {
 		return console.log(err.message);
 	}
