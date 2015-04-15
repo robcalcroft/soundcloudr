@@ -1,7 +1,7 @@
 soundcloudr
 ===========
 
-[![Build Status](https://travis-ci.org/robcalcroft/soundcloudr.svg?branch=master)](https://travis-ci.org/robcalcroft/soundcloudr) [![npm version](https://badge.fury.io/js/soundcloudr@2x.png)](http://badge.fury.io/js/soundcloudr)
+[![Build Status](https://travis-ci.org/robcalcroft/soundcloudr.svg?branch=master)](https://travis-ci.org/robcalcroft/soundcloudr) [![npm version](https://badge.fury.io/js/soundcloudr.svg)](http://badge.fury.io/js/soundcloudr)
 
 An express soundcloud downloader module
 
