@@ -211,55 +211,6 @@ module.exports = {
 			}, false);
 		}
 
-		var me = this;
-
-		request("http://api.soundcloud.com/resolve.json?url=" + rawUrl + "&client_id=" + this.getClientId(), function(error, response, data) {
-			if(error) {
-				return callback({
-					message: error,
-					status: 500
-				}, false);
-			}
-
-			if(response.statusCode !== 200) {
-				return callback({
-					message: me.errorStrings.not200,
-					status: response.statusCode
-				}, false);
-			}
-
-			data = JSON.parse(data);
-
-			// Check to see if the result is a 
-			// single song or user has provided
-			// link to e.g. artist account;
-			if(!me.isValidResponse(data)) {
-				return callback({
-					message: me.errorStrings.notvalid,
-					status: 400
-				}, false);
-			}
-
-
-			// Check if the song is streamable
-			if(!me.isStreamable(data)) {
-				return callback({
-					message: me.errorStrings.notstreamable,
-					status: 405
-				}, false);
-			}
-
-			var streamURL = me.createStreamUrl(data);
-
-			// Set headers to force download of file.
-			e_response.setHeader("Content-Type","application/octet-stream");
-			e_response.setHeader("Content-Transfer-Encoding", "Binary");
-			e_response.setHeader("Content-disposition", "attachment; filename=\"" + data.title + ".mp3\"");
-
-
-			// Request the file and pipe it to
-			// the response.
-			request.get(streamURL).pipe(e_response);
-		});
+		request.get(this.createStreamUrl(rawUrl)).pipe(e_response);
 	}
 };
